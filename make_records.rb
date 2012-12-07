@@ -27,7 +27,7 @@ def make_records(numbers, filename)
   records.each_with_index do |text, index|
     csv<< [index, text].to_csv
   end
-  File.open("#{filename},csv", 'w') {|f| f.puts csv}
+  File.open("#{filename}.csv", 'w') {|f| f.puts csv}
 end
 
 make_records(ARGV[0], ARGV[1])
