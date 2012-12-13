@@ -1,0 +1,12 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    amatch (0.2.10)
+      tins (~> 0.3)
+    tins (0.6.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  amatch
