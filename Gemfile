@@ -1,2 +1,8 @@
 source "http://rubygems.org"
+gem "test/unit"
+gem "minitest"
+gem "csv"
+gem "digest"
+gem "pp"
+gem "csv"
 gem "amatch"
