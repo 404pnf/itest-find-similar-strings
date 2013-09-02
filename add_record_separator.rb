@@ -1,5 +1,4 @@
-require 'minitest/autorun'
-
+require 'test/unit'
 
 INPUT = '''
 1 some text
@@ -17,10 +16,8 @@ def add_record_separator str
   str.gsub!(/(^\d+)/) {$1 + ','}
 end
 
-class TestAddRecordSeparator < MiniTest::Unit::TestCase
-
+class TestAddSeparators < Test::Unit::TestCase
   def test_add_record_separator
-    assert_equal OUTPUT, add_record_separator(INPUT), 'add comma as id, text separator'
+  	assert_equal OUTPUT, add_record_separator(INPUT)
   end
-1
 end

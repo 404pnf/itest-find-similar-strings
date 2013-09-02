@@ -1,10 +1,9 @@
 require 'csv'
-require 'test/unit'
+#require 'test/unit'
 require 'digest/md5'
 require 'pp'
 
 # USAGE: ruby script.rb inputfile
-
 
 # inputfile is a csv file with the format:
 # id, text
@@ -13,9 +12,9 @@ require 'pp'
 # 
 # We process the records with following steps
 # 1. parse csv, make it an array of arrays
-# 2. make a hash with md5sum as key, and id as values, each key can has multiple values
-# 3. caclulate md5sum of each record's text
-# 4. find those keys with multiple values.  Meaning they are identical. Return the result in an array
+# 2. make a hash of which each value is an array
+# 3. caclulate md5sum of each record's text, use the md5sum as key, and add the id to the value
+# 4. find those keys with multiple ids. Return the result in an array
 
 # HELPER FUNCTIONS
 def remove_non_words_and_downcase str
@@ -25,51 +24,23 @@ def remove_non_words_and_downcase str
   str.downcase
     .gsub(/\W/, '')
 end
-def text_md5sum str
-  # signature for md5
-  # Digest::MD5.hexdigest("Hello World\n")
-  Digest::MD5.hexdigest(str)
-end
-def find_duplicate_records
-  # step 1
-  inputfile = File.read ARGV[0]
-  array = []
-  CSV.parse(inputfile) {|row| array << row}
-  #p array
 
-  # step 2
-  db = Hash.new {|h, key| h[key]= []}
+def find_duplicate_records inputfile
   
-  # step 3
-  # a sample array
-  # [["0", "5av0afm7zf oocvikh1uo"], ["1", "qxuw4lzdql hh82g7jkic"]]
-  array.map! {|entry|  [entry[0], text_md5sum(entry[1])]}
-  # now array becomes [["0", "0721a89fcd7797946a477faea06fee65"], ["1", "7420c044640c553e27cbbf96b891ec23"]]
-  array.each do |entry|
-    key, value = entry[1], entry[0].to_i
-    db[key] << value 
+  # INPUT [id, text]
+  # OUTPUT [md5sum(text), [id1, id10 ... ]]
+  db = CSV.read(inputfile).reduce(Hash.new { |h, key| h[key]= [] }) do |acc, (id, text)|
+    key = Digest::MD5.hexdigest(text)
+    acc[key] << id
+    acc
   end
-  #pp db
-  
-  # step 4
-  result = []
-  db.each {|key, value|  result << value if db[key].size > 1}
-  pp result
+
+  db.reduce([]) { |acc, (_, ids)|  acc << ids if ids.size > 1 ; acc}
 end
+
 # RUN THE MAIN FUNCTION
-find_duplicate_records  if __FILE__ == $0
+inputfile = ARGV[0] || 'records.csv'
+_tmp_r = find_duplicate_records(inputfile)
+_r = _tmp_r.reduce('') { |acc, r| acc << r.to_csv ; acc }
+File.write('duplicates.txt', _r)
 
-# tests
-class TestFindDuplicateEntries < Test::Unit::TestCase
-
-  def test_text_md5sum
-    assert_equal 'fc3ff98e8c6a0d3087d515c0473f8677', text_md5sum('hello world!'), 'md5sum test'
-  end
-
-  def test_remove_non_words_and_downcase
-    assert_equal 'camelcase', remove_non_words_and_downcase('CamelCase'), 'case 1: downcase'
-    assert_equal 'iamhere', remove_non_words_and_downcase('I am here! '), 'case 2: remove punctuations!'
-    assert_equal 'timmyyes', remove_non_words_and_downcase('Timmy? Yes!'), 'case 3: remove punctuations'
-    assert_equal '', remove_non_words_and_downcase('`~!@#$%^&*()-+="\'/\\'), 'case 4: remove all non word characters'
-  end
-end
