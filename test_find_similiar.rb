@@ -1,6 +1,7 @@
 require 'test/unit'
 require_relative 'find_similar_records.rb'
 
+# testing
 class TestFindSimiliarEntries < Test::Unit::TestCase
 
   def test_remove_non_words_and_downcase
@@ -11,7 +12,7 @@ class TestFindSimiliarEntries < Test::Unit::TestCase
   end
 
   def test_keys_to_compare
-    assert_equal [[1, 2], [1, 3], [2, 3]], keys_to_compare([1,2,3]), 'keys_to_compare'
+    assert_equal [[1, 2], [1, 3], [2, 3]], keys_to_compare([1, 2, 3]), 'keys_to_compare'
   end
 
 end

@@ -1,6 +1,7 @@
 require 'test/unit'
 require_relative 'find_duplicate_records.rb'
 
+# testing
 class TestFindDuplicateEntries < Test::Unit::TestCase
 
   def test_remove_non_words_and_downcase
