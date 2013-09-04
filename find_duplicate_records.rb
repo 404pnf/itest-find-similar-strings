@@ -26,16 +26,13 @@ def remove_non_words_and_downcase(str)
 end
 
 def find_duplicate_records(inputfile)
-
   # INPUT [id, text]
   # OUTPUT [md5sum(text), [id1, id10 ... ]]
-  db = CSV.read(inputfile).reduce(Hash.new { |h, key| h[key] = [] }) do |a, (id, text)|
+  db = CSV.read(inputfile).each_with_object(Hash.new { |h, key| h[key] = [] }) do |(id, text), a|
     key = Digest::MD5.hexdigest(text)
     a[key] << id
-    a
   end
-
-  db.reduce([]) { |a, (_, ids)|  a << ids if ids.size > 1 ; a }
+  db.each_with_object([]) { |(_, ids), a|  a << ids if ids.size > 1 }
 end
 
 def main
