@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>find_duplicate_records.rb</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="add_record_separator.html">
+                add_record_separator.rb
+              </a>
+            
+              
+              <a class="source" href="find_duplicate_records.html">
+                find_duplicate_records.rb
+              </a>
+            
+              
+              <a class="source" href="find_similar_records.html">
+                find_similar_records.rb
+              </a>
+            
+              
+              <a class="source" href="make_records.html">
+                make_records.rb
+              </a>
+            
+              
+              <a class="source" href="test_find_duplicates.html">
+                test_find_duplicates.rb
+              </a>
+            
+              
+              <a class="source" href="test_find_similiar.html">
+                test_find_similiar.rb
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>find_duplicate_records.rb</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h2>使用方法</h2>
+<pre><code> USAGE: ruby script.rb inputfile</code></pre>
+<hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="keyword">require</span> <span class="string">'csv'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>require &#39;test/unit&#39;</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="keyword">require</span> <span class="string">'digest/md5'</span>
+<span class="keyword">require</span> <span class="string">'pp'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <h2>命名空间呗</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="class"><span class="keyword">module</span> <span class="title">ItestFindDuplicateRecords</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>inputfile is a csv file with the format:
+id, text
+id, text
+...</p>
+<p>We process the records with following steps
+1. parse csv, make it an array of arrays
+2. make a hash of which each value is an array
+3. caclulate md5sum of each record&#39;s text, use the md5sum as key, and add the id to the value
+4. find those keys with multiple ids. Return the result in an array</p>
+<p>HELPER FUNCTIONS
+\W means charcaters not in range [a-zA-z0-9<em>]
+dash &#39;-&#39; is removed, but underscore &#39;</em>&#39; is kept
+whitespace is not part of \w so they are removed, too!</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="function"><span class="keyword">def</span> <span class="title"><span class="keyword">self</span></span>.<span class="title">remove_non_words_and_downcase</span><span class="params">(str)</span></span>
+    str.downcase
+      .gsub(<span class="regexp">/\W/</span>, <span class="string">''</span>)
+  <span class="keyword">end</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>INPUT [id, text]
+OUTPUT [md5sum(text), [id1, id10 ... ]]</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="function"><span class="keyword">def</span> <span class="title"><span class="keyword">self</span></span>.<span class="title">find_duplicate_records</span><span class="params">(inputfile)</span></span>
+    db = <span class="constant">CSV</span>.read(inputfile).each_with_object(<span class="constant">Hash</span>.new { |h, key| h[key] = [] }) <span class="keyword">do</span> |(id, text), a|
+      key = <span class="constant">Digest::MD5</span>.hexdigest(text)
+      a[key] &lt;&lt; id
+    <span class="keyword">end</span>
+    db.each_with_object([]) { |(<span class="number">_</span>, ids), a|  a &lt;&lt; ids <span class="keyword">if</span> ids.size &gt; <span class="number">1</span> }
+  <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+
+<span class="function"><span class="keyword">def</span> <span class="title">main</span></span>
+  inputfile = <span class="constant">ARGV</span>[<span class="number">0</span>] || <span class="string">'records.csv'</span>
+  tmp_r = <span class="constant">ItestFindDuplicateRecords</span>.find_duplicate_records(inputfile)
+  r = tmp_r.each_with_object(<span class="string">''</span>) { |e, a| a &lt;&lt; e.to_csv }
+  pp r
+  <span class="constant">File</span>.write(<span class="string">'duplicates.txt'</span>, r)
+<span class="keyword">end</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>RUN THE MAIN FUNCTION</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>main <span class="keyword">if</span> __FILE_<span class="number">_</span> == <span class="variable">$PROGRAM_NAME</span></pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
